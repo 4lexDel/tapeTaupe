@@ -1,9 +1,10 @@
-const socket = io();
+//const socket = io();
 
 console.log("begin ! ");
 
 socket.on('targets list', function(list) {
     targets = list;
+    console.log("Graph refresh");
 });
 
 let targets = [];
@@ -63,7 +64,7 @@ document.addEventListener("click", function(event) {
 
 ///////////////////////////////////
 
-const keyboard = {};
+/*const keyboard = {};
 
 window.onkeydown = function(e) {
     keyboard[e.key] = true;
@@ -74,8 +75,8 @@ window.onkeyup = function(e) {
 };
 
 function movePlayer() {
-    /*if (keyboard['ArrowLeft']) socket.emit('move left');
-    if (keyboard['ArrowUp']) socket.emit('move up');
-    if (keyboard['ArrowRight']) socket.emit('move right');
-    if (keyboard['ArrowDown']) socket.emit('move down');*/
-}
+    //if (keyboard['ArrowLeft']) socket.emit('move left');
+    //if (keyboard['ArrowUp']) socket.emit('move up');
+    //if (keyboard['ArrowRight']) socket.emit('move right');
+    //if (keyboard['ArrowDown']) socket.emit('move down');
+}*/

@@ -12,3 +12,5 @@ A FAIRE :
 
 
     Penser à remettre ecrtaines variable en undefined pour bien les reset
+
+    Delete room quand y'a personne

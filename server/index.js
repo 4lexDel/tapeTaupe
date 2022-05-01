@@ -75,7 +75,12 @@ function selectRoom(id) {
 
 function update() {
     rooms.forEach(room => {
-        if (room.targets.length > 0) io.to(room.id).volatile.emit('targets list', Object.values(room.targets)); //Actualise le jeu pour les clients pour chaque room
+        if (room.targets.length > 0) {
+            console.log(room.id + " : " + room.targets.length);
+            //console.log(room.targets);
+            //console.log("Update execution")
+            io.volatile.to(room.id).emit('targets list', Object.values(room.targets)); //Actualise le jeu pour les clients pour chaque room
+        }
     });
 }
 setInterval(update, 1000 / 60);
@@ -89,15 +94,15 @@ setInterval(function() { //generation des targets
 
 
 io.on('connection', (socket) => {
-    console.log("Bonjour");
+    console.log("Bonjour " + socket.id);
     players.push(new Player(socket.id, "guest"));
 
     socket.on("disconnect", () => {
-        console.log("Au revoir !")
+        console.log("Au revoir " + socket.id)
 
         player = selectPlayer(socket.id);
         if (player.roomID != undefined) {
-            room = selectRoom(player.roomID);
+            let room = selectRoom(player.roomID);
 
             room.removePlayer(socket.id); //Player enlevé du cache de la room
             socket.leave(room.id); //Deco de la room
@@ -108,26 +113,28 @@ io.on('connection', (socket) => {
 
     socket.on('coords click', function(coords) {
         console.log("Coords recu : X = " + coords.posX + " | Y = " + coords.posY)
-        x = coords.posX;
-        y = coords.posY;
+        let x = coords.posX;
+        let y = coords.posY;
 
         player = selectPlayer(socket.id);
         //LOURD ?????????????
-        room = selectRoom(player.roomID);
+        if (player.roomID != undefined) {
+            let room = selectRoom(player.roomID);
+            room.killTarget(x, y);
+        }
 
-        room.killTarget(x, y);
 
         //killTarget(x, y);
     });
 
     socket.on('create room', (roomID) => {
-        console.log("test : " + roomID + " : " + io.sockets.adapter.rooms.has(roomID));
+        console.log("Create : " + roomID + " : " + io.sockets.adapter.rooms.has(roomID));
         if (!io.sockets.adapter.rooms.has(roomID)) {
             console.log("SUCCESS")
             io.to(socket.id).emit('room created', true);
             socket.join(roomID); //Le createur de la room la rejoint automatiquement
 
-            newRoom = new Room(roomID);
+            let newRoom = new Room(roomID);
 
             rooms.push(newRoom);
             newRoom.addPlayer(selectPlayer(socket.id));
@@ -138,13 +145,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on('join room', (roomID) => {
-        console.log("test : " + roomID + " : " + io.sockets.adapter.rooms.has(roomID));
+        console.log("Join : " + roomID + " : " + io.sockets.adapter.rooms.has(roomID));
         if (io.sockets.adapter.rooms.has(roomID) && selectPlayer(socket.id).roomID == undefined) {
             console.log("SUCCESS")
 
             io.to(socket.id).emit('room joined', true); //EMPECHER DE REJOINDRE LA MEME ??
             socket.join(roomID);
-            selectRoom(roomID).addPlayer(selectPlayer(socket.id)); ///////
+            let room = selectRoom(roomID);
+            room.addPlayer(selectPlayer(socket.id)); ///////
         } else {
             console.log("Failed")
             io.to(socket.id).emit('room joined', false);

@@ -5,7 +5,7 @@ require('./Target.js');
 require('./Player.js');
 
 module.exports = function(id) {
-    this.id;
+    this.id = id;
 
     this.players = [];
     this.targets = [];
