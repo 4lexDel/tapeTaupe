@@ -1,0 +1,14 @@
+A FAIRE :
+    Player : Lie à l'ID socket 
+        Appartient à une Room
+
+    Room : Objet avec Player
+        Possede un id de room
+        Liste de players
+        Differentes fct (deplacer celle dans Target)
+
+    Moduler les configs
+
+
+
+    Penser à remettre ecrtaines variable en undefined pour bien les reset

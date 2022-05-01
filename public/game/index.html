@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="../assets/vendors/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-info">
+    <div class="container-fluid" id="homeContent">
+        <div class="row justify-content-center">
+            <div class="form col-sm-4">
+                <br><br>
+                <div class="row justify-content-center">
+                    <h1 class="col-sm-3">Home</h1>
+                </div>
+
+                <br><br><br><br><br>
+
+                <div class="row justify-content-center">
+                    <label class="" for="roomID">Enter a room ID</label><br>
+                    <input class="form-control" type="text" name="roomID" id="inputRoomID">
+                </div>
+                <br><br>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <button class="w-100 btn btn-secondary btn-lg" onclick="joinRoom()">Join room</button>
+                        </div>
+                        <div class="col-sm-6">
+                            <button class="w-100 btn btn-primary btn-lg" onclick="createRoom()">Create room</button>
+                        </div>
+                    </div>
+                </div>
+                <br><br>
+                <div class="row justify-content-center" id="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameContent">
+        <h1>Tape taupe</h1>
+
+        <canvas id="canvas" width="800" height="600" style="background-color: beige;">
+        </canvas>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="../assets/vendors/jquery/jquery-3.6.0.min.js"></script>
+    <script src="./script.js"></script>
+    <script src="game.js"></script>
+
+</body>
+
+</html>
+
+<!--
+    Redirection en js : https://www.delftstack.com/fr/howto/javascript/javascript-redirect/
+-->
