@@ -17,8 +17,20 @@ module.exports = function(id) {
 
     this.removePlayer = function(id) {
         for (let i = 0; i < this.players.length; i++) {
-            if (this.players[i].id == id) this.players.slice(i, 1);
+            if (this.players[i].id == id) {
+                console.log(i);
+                console.log('test delete ' + this.players);
+                this.players = this.players.slice(0, i).concat(this.players.slice(i + 1));
+                console.log('test delete ' + this.players);
+                return true;
+            }
         }
+        return false;
+    }
+
+    this.isEmpty = function() {
+        if (this.players.length <= 0) return true;
+        return false;
     }
 
     this.generateTarget = function() {

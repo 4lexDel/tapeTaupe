@@ -1,17 +1,10 @@
 var express = require('express');
-var path = require('path');
 const open = require('open');
-
-const resolve = require('path').resolve;
 
 var app = express();
 
-//app.use(express.static(path.join(__dirname, 'public')));
-//app.use(express.static(resolve("./public/")));
 app.use(express.static("public"));
-app.use(express.static("public/home"));
 app.use(express.static("public/game"));
-//app.use(express.static(resolve("./public/game/")));
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
@@ -29,23 +22,19 @@ function getPublicPath() {
 
 server.listen(3000, 'localhost', () => { //SERVEUR
     console.log('Ecoute sur le port 3000');
-
-    //console.log(__dirname.split("\\").pop());
 });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const tools = require('./tools.js');
-const Target = require('./Target.js');
-const Room = require('./Room.js');
+const Room = require('./Room.js'); //Class pricnipales
 const Player = require('./Player.js');
 
 var players = []
 
-rooms = [] //On stocke les rooms
+var rooms = [] //On stocke les rooms
 
 app.get('/', (req, res) => {
-    res.sendFile(getPublicPath() + "/home");
+    res.sendFile(getPublicPath() + "/game");
     //res.sendFile(getPublicPath() + "/game/game.html");
 });
 
@@ -76,7 +65,7 @@ function selectRoom(id) {
 function update() {
     rooms.forEach(room => {
         if (room.targets.length > 0) {
-            console.log(room.id + " : " + room.targets.length);
+            //console.log(rooms.length + " | " + room.id + " : " + room.players.length + " player(s)");
             //console.log(room.targets);
             //console.log("Update execution")
             io.volatile.to(room.id).emit('targets list', Object.values(room.targets)); //Actualise le jeu pour les clients pour chaque room
@@ -87,6 +76,12 @@ setInterval(update, 1000 / 60);
 
 setInterval(function() { //generation des targets
     rooms.forEach(room => {
+        console.log(rooms.length + " | " + room.id + " : " + room.players.length + " player(s)");
+    });
+}, 1000); //Recup id pour stop*/
+
+setInterval(function() { //generation des targets
+    rooms.forEach(room => {
         room.generateTarget();
     });
 }, 1000); //Recup id pour stop*/
@@ -94,18 +89,26 @@ setInterval(function() { //generation des targets
 
 
 io.on('connection', (socket) => {
-    console.log("Bonjour " + socket.id);
-    players.push(new Player(socket.id, "guest"));
+    console.log("Bonjour " + socket.id); //Première connexion
+    players.push(new Player(socket.id, "guest" + socket.id));
 
     socket.on("disconnect", () => {
         console.log("Au revoir " + socket.id)
 
-        player = selectPlayer(socket.id);
+        let player = selectPlayer(socket.id);
         if (player.roomID != undefined) {
             let room = selectRoom(player.roomID);
 
             room.removePlayer(socket.id); //Player enlevé du cache de la room
-            socket.leave(room.id); //Deco de la room
+
+            io.to(room.id).emit('players list', Object.values(room.players)); //Liste refresh pour les joueurs restants
+
+            socket.leave(player.roomID); //Deco de la room
+
+            if (room.isEmpty()) {
+                console.log("REMOVE IT !"); //////////////////////////////////////////////////////////////
+                removeRoom(room.id);
+            }
         }
 
         removePlayer(socket.id);
@@ -116,7 +119,7 @@ io.on('connection', (socket) => {
         let x = coords.posX;
         let y = coords.posY;
 
-        player = selectPlayer(socket.id);
+        let player = selectPlayer(socket.id);
         //LOURD ?????????????
         if (player.roomID != undefined) {
             let room = selectRoom(player.roomID);
@@ -132,12 +135,15 @@ io.on('connection', (socket) => {
         if (!io.sockets.adapter.rooms.has(roomID)) {
             console.log("SUCCESS")
             io.to(socket.id).emit('room created', true);
+
             socket.join(roomID); //Le createur de la room la rejoint automatiquement
 
             let newRoom = new Room(roomID);
 
             rooms.push(newRoom);
             newRoom.addPlayer(selectPlayer(socket.id));
+
+            io.to(newRoom.id).emit('players list', Object.values(newRoom.players)); //Liste refresh
         } else {
             console.log("Failed")
             io.to(socket.id).emit('room created', false);
@@ -148,11 +154,13 @@ io.on('connection', (socket) => {
         console.log("Join : " + roomID + " : " + io.sockets.adapter.rooms.has(roomID));
         if (io.sockets.adapter.rooms.has(roomID) && selectPlayer(socket.id).roomID == undefined) {
             console.log("SUCCESS")
-
             io.to(socket.id).emit('room joined', true); //EMPECHER DE REJOINDRE LA MEME ??
+
             socket.join(roomID);
             let room = selectRoom(roomID);
             room.addPlayer(selectPlayer(socket.id)); ///////
+
+            io.to(room.id).emit('players list', Object.values(room.players)); //Liste refresh
         } else {
             console.log("Failed")
             io.to(socket.id).emit('room joined', false);

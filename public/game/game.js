@@ -7,6 +7,24 @@ socket.on('targets list', function(list) {
     console.log("Graph refresh");
 });
 
+socket.on('players list', function(list) {
+    players = list;
+    console.log("Player list refresh");
+
+    refreshPlayerList(list);
+});
+
+function refreshPlayerList(players) {
+    let htmlContent = "<ul>";
+
+    players.forEach(player => {
+        htmlContent += "<li>" + player.name + " : " + player.score + "</li>";
+    });
+    htmlContent += "</ul>";
+
+    $("#playerList").html(htmlContent);
+}
+
 let targets = [];
 
 const ctx = canvas.getContext('2d');
@@ -31,7 +49,7 @@ function update() {
 // first call
 requestAnimationFrame(update);
 
-document.addEventListener("click", function(event) {
+$("canvas").click(function(event) {
     x = event.offsetX;
     y = event.offsetY;
 
