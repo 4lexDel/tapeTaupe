@@ -1,5 +1,5 @@
 const Target = require('./Target.js');
-const { checkCollision } = require('./tools.js');
+const { checkCollision, getRandomInt } = require('./tools.js');
 
 require('./Target.js');
 require('./Player.js');
@@ -35,16 +35,18 @@ module.exports = function(id) {
 
     this.generateTarget = function() {
         //console.log("add : " + targets.length);               //Ajout de "taupes"
-        this.targets.push(new Target(50, true, 1));
+        this.targets.push(new Target(50, Math.round(Math.random()), 1));
     }
 
     this.killTarget = function(x, y) {
         for (let i = 0; i < this.targets.length; i++) {
             if (checkCollision(x, y, this.targets[i])) {
+                let val = this.targets[i].value;
                 this.targets.splice(i, 1);
-                return true;
+
+                return val;
             }
         }
-        return false;
+        return undefined;
     }
 }

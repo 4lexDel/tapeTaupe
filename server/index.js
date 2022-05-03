@@ -28,6 +28,7 @@ server.listen(3000, 'localhost', () => { //SERVEUR
 
 const Room = require('./Room.js'); //Class pricnipales
 const Player = require('./Player.js');
+require('./Target.js');
 
 var players = []
 
@@ -123,7 +124,14 @@ io.on('connection', (socket) => {
         //LOURD ?????????????
         if (player.roomID != undefined) {
             let room = selectRoom(player.roomID);
-            room.killTarget(x, y);
+
+            let val = room.killTarget(x, y);
+            if (val != undefined) {
+                player.score += val;
+
+                console.log(val);
+                io.to(room.id).emit('players list', Object.values(room.players)); //Liste refresh
+            }
         }
 
 

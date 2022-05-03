@@ -1,4 +1,4 @@
 A FAIRE :
     Ajout d'aléatoire dans le jeu (délai, taille, valur, type...)
-    Systeme de score
 
+    Systeme d'expiration des targets
