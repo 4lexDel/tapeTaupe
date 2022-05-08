@@ -22,6 +22,8 @@
                 <br><br><br><br><br>
 
                 <div class="row justify-content-center">
+                    <label class="" for="pseudoID">Pseudo</label><br>
+                    <input class="form-control" type="text" name="pseudo" id="inputPseudoID">
                     <label class="" for="roomID">Enter a room ID</label><br>
                     <input class="form-control" type="text" name="roomID" id="inputRoomID">
                 </div>
@@ -43,14 +45,41 @@
     </div>
 
     <div id="gameContent">
-        <h1>Tape taupe</h1>
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-sm-2">
+                    <h1>Tape taupe</h1>
+                </div>
+                <br><br><br>
+            </div>
+            <div class="row">
+                <div class="col-sm-3">
+                    <h4>Players list</h4>
+                    <div id="playerList">
+                    </div>
 
-        <div id="playerList">
+                    <br><br>
 
+                    <h4>Chat</h4>
+                    <div id="chatArea">
+                    </div>
+                    <br>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" name="message" id="inputMessageID">
+                            </div>
+                            <div class="col-sm-4">
+                                <button class="btn btn-primary btn-lg" onclick="sendMessage()">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-9">
+                    <canvas id="canvas" width="1000px" height="600px" style="background-color: beige;"></canvas>
+                </div>
+            </div>
         </div>
-
-        <canvas id="canvas" width="800" height="600" style="background-color: beige;">
-        </canvas>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>

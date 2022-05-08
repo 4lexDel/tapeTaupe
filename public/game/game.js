@@ -2,9 +2,28 @@
 
 console.log("begin ! ");
 
+function sendMessage() {
+    message = $("#inputMessageID").val();
+    $("#inputMessageID").val("");
+
+
+    if (message != "") {
+        socket.emit("send message", message);
+    }
+}
+
+socket.on('message', (player, message) => {
+    let author = "otherMessage";
+    if (player.id == socket.id) author = "myMessage";
+
+    let msgHTML = '<div class="message ' + author + '">' + player.name + ' : ' + message + '</div>';
+    console.log("MSG RECEIVE !");
+    $('#chatArea').append(msgHTML);
+})
+
 socket.on('targets list', function(list) {
     targets = list;
-    console.log("Graph refresh");
+    //console.log("Graph refresh");
 });
 
 socket.on('players list', function(list) {

@@ -9,8 +9,10 @@ app.use(express.static("public/game"));
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
+const port = 5000;
+
 (async() => {
-    await open('http://localhost:3000/');
+    await open('http://192.168.1.69:' + port + '/');
 })();
 
 function getPublicPath() {
@@ -20,8 +22,8 @@ function getPublicPath() {
     return test.join("\\");
 }
 
-server.listen(3000, 'localhost', () => { //SERVEUR
-    console.log('Ecoute sur le port 3000');
+server.listen(port, '192.168.1.69', () => { //SERVEUR
+    console.log('Ecoute sur le port ' + port);
 });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +85,7 @@ setInterval(function() { //generation des targets
 
 setInterval(function() { //generation des targets
     rooms.forEach(room => {
-        room.generateTarget();
+        if (room.targets.length <= 10) room.generateTarget();
     });
 }, 1000); //Recup id pour stop*/
 
@@ -138,7 +140,7 @@ io.on('connection', (socket) => {
         //killTarget(x, y);
     });
 
-    socket.on('create room', (roomID) => {
+    socket.on('create room', (roomID, pseudo) => {
         console.log("Create : " + roomID + " : " + io.sockets.adapter.rooms.has(roomID));
         if (!io.sockets.adapter.rooms.has(roomID)) {
             console.log("SUCCESS")
@@ -147,9 +149,13 @@ io.on('connection', (socket) => {
             socket.join(roomID); //Le createur de la room la rejoint automatiquement
 
             let newRoom = new Room(roomID);
+            let player = selectPlayer(socket.id);
+            player.name = pseudo;
+
+            console.log(pseudo);
 
             rooms.push(newRoom);
-            newRoom.addPlayer(selectPlayer(socket.id));
+            newRoom.addPlayer(player);
 
             io.to(newRoom.id).emit('players list', Object.values(newRoom.players)); //Liste refresh
         } else {
@@ -158,7 +164,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('join room', (roomID) => {
+    socket.on('join room', (roomID, pseudo) => {
         console.log("Join : " + roomID + " : " + io.sockets.adapter.rooms.has(roomID));
         if (io.sockets.adapter.rooms.has(roomID) && selectPlayer(socket.id).roomID == undefined) {
             console.log("SUCCESS")
@@ -166,7 +172,10 @@ io.on('connection', (socket) => {
 
             socket.join(roomID);
             let room = selectRoom(roomID);
-            room.addPlayer(selectPlayer(socket.id)); ///////
+            let player = selectPlayer(socket.id);
+            player.name = pseudo;
+
+            room.addPlayer(player); ///////
 
             io.to(room.id).emit('players list', Object.values(room.players)); //Liste refresh
         } else {
@@ -174,4 +183,12 @@ io.on('connection', (socket) => {
             io.to(socket.id).emit('room joined', false);
         }
     });
+
+    socket.on('send message', (message) => {
+        let player = selectPlayer(socket.id);
+
+        console.log("Message de " + player.name + " : " + message);
+
+        io.to(player.roomID).emit('message', player, message)
+    })
 })

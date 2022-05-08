@@ -2,3 +2,6 @@ A FAIRE :
     Ajout d'aléatoire dans le jeu (délai, taille, valur, type...)
 
     Systeme d'expiration des targets
+
+
+    Point négatif si fails de coords

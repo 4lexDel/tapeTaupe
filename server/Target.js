@@ -1,5 +1,5 @@
 const tools = require('./tools.js');
-const conf = require('./conf.js');
+const conf = require('./global.js');
 
 module.exports = function(r, type, value) {
     this.x = tools.getRandomInt(0, conf.width);
