@@ -3,16 +3,16 @@ const open = require('open');
 
 var app = express();
 
-app.use(express.static("public"));
-app.use(express.static("public/game"));
-
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+
+app.use(express.static("public"));
+app.use(express.static("public/game"));
 
 const port = 5000;
 
 (async() => {
-    await open('http://192.168.1.69:' + port + '/');
+    await open('http://localhost:' + port + '/');
 })();
 
 function getPublicPath() {
@@ -22,14 +22,18 @@ function getPublicPath() {
     return test.join("\\");
 }
 
-server.listen(port, '192.168.1.69', () => { //SERVEUR
+const requestListener = function(req, res) {
+    res.end("Your IP Addresss is: " + req.socket.localAddress);
+};
+
+server.listen(port, 'localhost', () => { //SERVEUR
     console.log('Ecoute sur le port ' + port);
 });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const Room = require('./Room.js'); //Class pricnipales
-const Player = require('./Player.js');
+Player = require('./Player.js');
 require('./Target.js');
 
 var players = []
@@ -37,7 +41,8 @@ var players = []
 var rooms = [] //On stocke les rooms
 
 app.get('/', (req, res) => {
-    res.sendFile(getPublicPath() + "/game");
+    //res.sendFile(getPublicPath() + "/game");
+    //req.socket.localAddress;
     //res.sendFile(getPublicPath() + "/game/game.html");
 });
 
